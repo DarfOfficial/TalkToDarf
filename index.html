@@ -67,33 +67,34 @@
   <div id="respuesta"></div>
 
   <script>
-    async function enviarMensaje() {
-      const mensaje = document.getElementById("mensaje").value;
-      if (!mensaje) return;
+  async function enviarMensaje() {
+    const mensaje = document.getElementById("mensaje").value;
+    const respuestaDiv = document.getElementById("respuesta");
 
-      document.getElementById("respuesta").innerText = "Pensando...";
+    if (!mensaje) return;
 
-      try {
-        const response = await fetch("https://darfofficial-talktodarf.hf.space/run/predict", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input_text: mensaje })
-        });
+    respuestaDiv.innerText = "Pensando...";
 
-        const data = await response.json();
+    try {
+      const response = await fetch("https://darfofficial-talktodarf.hf.space/api/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: [mensaje] })
+      });
 
-        if (data && data.output) {
-          document.getElementById("respuesta").innerText = data.output;
-        } else {
-          document.getElementById("respuesta").innerText = "Error: respuesta vacía o malformada.";
-          console.log("Respuesta completa:", data);
-        }
-      } catch (error) {
-        document.getElementById("respuesta").innerText = "Error al obtener respuesta";
-        console.error(error);
+      const result = await response.json();
+      if (result && result.data && result.data[0]) {
+        respuestaDiv.innerText = result.data[0];
+      } else {
+        respuestaDiv.innerText = "Error: respuesta vacía o malformada.";
       }
+    } catch (error) {
+      console.error(error);
+      respuestaDiv.innerText = "Error al obtener respuesta.";
     }
-  </script>
+  }
+</script>
+
 </body>
 </html>
 
