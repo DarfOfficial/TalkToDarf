@@ -95,17 +95,17 @@
     respuestaElemento.textContent = "Pensando...";
 
     try {
-      const response = await fetch("https://darfofficial-talktodarf.hf.space/predict", {
+      const response = await fetch("https://darfofficial-talktodarf.hf.space/run/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: [entrada] })
+        body: JSON.stringify({ input_text: entrada })
       });
 
       const resultado = await response.json();
-      console.log("RESPUESTA CRUDA:", resultado);
+      console.log("RESPUESTA:", resultado);
 
-      if (resultado && resultado.data && resultado.data[0]) {
-        respuestaElemento.textContent = resultado.data[0];
+      if (resultado && resultado.output) {
+        respuestaElemento.textContent = resultado.output;
       } else {
         respuestaElemento.textContent = "Error: Respuesta vacía o formato inesperado.";
       }
