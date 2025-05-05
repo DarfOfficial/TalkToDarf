@@ -86,45 +86,36 @@
   <div id="respuesta"></div>
 
   <script>
-    async function enviarMensaje() {
-      const mensaje = document.getElementById("mensaje").value;
-      const respuestaDiv = document.getElementById("respuesta");
-      if (!mensaje) return;
+  async function enviarMensaje() {
+    const entrada = document.getElementById("mensaje").value;
+    const respuestaElemento = document.getElementById("respuesta");
 
-      respuestaDiv.innerHTML = "<span>Pensando...</span>";
+    if (!entrada) return;
 
-      try {
-        const response = await fetch("https://darfofficial-talktodarf.hf.space/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: [mensaje] })
-        });
+    respuestaElemento.textContent = "Pensando...";
 
-        const data = await response.json();
-        const texto = data.data[0];
+    try {
+      const response = await fetch("https://darfofficial-talktodarf.hf.space/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: [entrada] })
+      });
 
-        typewriter(respuestaDiv, texto);
-      } catch (error) {
-        respuestaDiv.innerHTML = "<span>Error al obtener respuesta</span>";
-      }
-    }
-
-    function typewriter(element, text) {
-      element.innerHTML = '<div class="typewriter"><span></span></div>';
-      const span = element.querySelector("span");
-      let i = 0;
-
-      function escribir() {
-        if (i < text.length) {
-          span.textContent += text.charAt(i);
-          i++;
-          setTimeout(escribir, 20);
-        }
+      const resultado = await response.json();
+      console.log("RESPUESTA CRUDA:", resultado);
+      
+      if (resultado && resultado.data && resultado.data[0]) {
+        respuestaElemento.textContent = resultado.data[0];
+      } else {
+        respuestaElemento.textContent = "Error: Respuesta vacía o formato inesperado.";
       }
 
-      escribir();
+    } catch (error) {
+      console.error("ERROR EN FETCH:", error);
+      respuestaElemento.textContent = "Error al obtener respuesta del servidor.";
     }
-  </script>
+  }
+</script>
 </body>
 </html>
 
