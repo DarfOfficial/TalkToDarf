@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
       font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(to right, #1c1c1c, #2c2c2c);
+      background: #1c1c1c;
       color: white;
       text-align: center;
       min-height: 100vh;
@@ -45,7 +45,6 @@
       background-color: #4CAF50;
       color: white;
       cursor: pointer;
-      transition: 0.3s ease;
     }
 
     button:hover {
@@ -57,65 +56,44 @@
       font-style: italic;
       max-width: 80%;
       word-wrap: break-word;
-      min-height: 60px;
-    }
-
-    .typewriter span {
-      display: inline-block;
-      overflow: hidden;
-      white-space: nowrap;
-      border-right: 2px solid #fff;
-      animation: typing 2s steps(40, end), blink 0.75s step-end infinite;
-    }
-
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
-    @keyframes blink {
-      50% { border-color: transparent }
     }
   </style>
 </head>
 <body>
   <h1>¡Hola! Soy TalkToDarf</h1>
-  <p>Escríbeme algo y te responderé con GPT-2</p>
+  <p>Escríbeme algo y te responderé usando GPT</p>
   <input type="text" id="mensaje" placeholder="Escribe tu mensaje aquí..." />
   <button onclick="enviarMensaje()">Enviar</button>
   <div id="respuesta"></div>
 
   <script>
-  async function enviarMensaje() {
-    const entrada = document.getElementById("mensaje").value;
-    const respuestaElemento = document.getElementById("respuesta");
+    async function enviarMensaje() {
+      const mensaje = document.getElementById("mensaje").value;
+      if (!mensaje) return;
 
-    if (!entrada) return;
+      document.getElementById("respuesta").innerText = "Pensando...";
 
-    respuestaElemento.textContent = "Pensando...";
+      try {
+        const response = await fetch("https://darfofficial-talktodarf.hf.space/run/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input_text: mensaje })
+        });
 
-    try {
-      const response = await fetch("https://darfofficial-talktodarf.hf.space/run/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input_text: entrada })
-      });
+        const data = await response.json();
 
-      const resultado = await response.json();
-      console.log("RESPUESTA:", resultado);
-
-      if (resultado && resultado.output) {
-        respuestaElemento.textContent = resultado.output;
-      } else {
-        respuestaElemento.textContent = "Error: Respuesta vacía o formato inesperado.";
+        if (data && data.output) {
+          document.getElementById("respuesta").innerText = data.output;
+        } else {
+          document.getElementById("respuesta").innerText = "Error: respuesta vacía o malformada.";
+          console.log("Respuesta completa:", data);
+        }
+      } catch (error) {
+        document.getElementById("respuesta").innerText = "Error al obtener respuesta";
+        console.error(error);
       }
-
-    } catch (error) {
-      console.error("ERROR EN FETCH:", error);
-      respuestaElemento.textContent = "Error al obtener respuesta del servidor.";
     }
-  }
-</script>
+  </script>
 </body>
 </html>
 
